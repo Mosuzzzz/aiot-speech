@@ -3,7 +3,8 @@ const express = require("express");
 const cors = require("cors");
 
 const app = express();
-const PORT = 3000;
+const port = Number.parseInt(process.env.PORT || "8080", 10);
+const host = process.env.HOST || "127.0.0.1";
 
 app.use(cors());
 app.use(express.json());
@@ -111,11 +112,10 @@ app.get("/api/test", (req, res) => {
 // ==============================
 // Start Server
 // ==============================
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(port, host, () => {
   console.log("==============================");
   console.log(" AIoT Backend Server");
   console.log("==============================");
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Local: http://localhost:${PORT}`);
+  console.log(`Server running on http://${host}:${port}`);
   console.log();
 });
