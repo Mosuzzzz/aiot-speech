@@ -1,121 +1,366 @@
 
 const express = require("express");
 const cors = require("cors");
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
-const port = Number.parseInt(process.env.PORT || "8080", 10);
-const host = process.env.HOST || "127.0.0.1";
+
+const port = Number.parseInt(
+  process.env.PORT || "8080",
+  10
+);
+
+const host =
+  process.env.HOST || "127.0.0.1";
+
+
+// ==============================
+// Upload directory
+// ==============================
+
+const uploadDir =
+  path.join(__dirname, "uploads");
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, {
+    recursive: true
+  });
+}
+
+
+// ==============================
+// Multer storage
+// ==============================
+
+const storage =
+  multer.diskStorage({
+
+    destination: (
+      req,
+      file,
+      cb
+    ) => {
+      cb(null, uploadDir);
+    },
+
+    filename: (
+      req,
+      file,
+      cb
+    ) => {
+
+      const filename =
+        `audio-${Date.now()}.webm`;
+
+      cb(null, filename);
+    }
+
+  });
+
+
+const upload =
+  multer({
+
+    storage: storage,
+
+    limits: {
+      fileSize:
+        50 * 1024 * 1024
+    }
+
+  });
+
+
+// ==============================
+// Middleware
+// ==============================
 
 app.use(cors());
-app.use(express.json());
-app.use(express.static("public"));
 
-// Current recording state
+app.use(express.json());
+
+app.use(
+  express.static(
+    path.join(__dirname, "public")
+  )
+);
+
+
+// ==============================
+// State
+// ==============================
+
 let recording = false;
 
-// Store last device event
 let lastEvent = null;
+
+let lastAudio = null;
 
 
 // ==============================
 // Root
 // ==============================
+
 app.get("/", (req, res) => {
-  res.send("AIoT Backend Running");
+
+  res.sendFile(
+    path.join(
+      __dirname,
+      "public",
+      "index.html"
+    )
+  );
+
 });
 
 
 // ==============================
-// ESP32 START RECORDING
+// ESP32 START
 // ==============================
-app.post("/api/start", (req, res) => {
-  console.log();
-  console.log("==============================");
-  console.log("ESP32 START RECORDING");
-  console.log("==============================");
 
-  console.log("Received body:");
-  console.log(req.body);
+app.post(
+  "/api/start",
+  (req, res) => {
 
-  recording = true;
+    console.log();
+    console.log(
+      "=============================="
+    );
+    console.log(
+      "ESP32 START RECORDING"
+    );
+    console.log(
+      "=============================="
+    );
 
-  lastEvent = {
-    device_id: req.body.device_id || "unknown",
-    event: "START_RECORDING",
-    timestamp: new Date()
-  };
+    console.log(
+      "Received body:",
+      req.body
+    );
 
-  console.log("Recording:", recording);
-  console.log();
+    recording = true;
 
-  res.status(200).json({
-    success: true,
-    message: "Recording started",
-    recording: true
-  });
-});
+    lastEvent = {
+      device_id:
+        req.body.device_id ||
+        "unknown",
 
+      event:
+        "START_RECORDING",
 
-// ==============================
-// ESP32 STOP RECORDING
-// ==============================
-app.post("/api/stop", (req, res) => {
-  console.log();
-  console.log("==============================");
-  console.log("ESP32 STOP RECORDING");
-  console.log("==============================");
+      timestamp:
+        new Date()
+    };
 
-  console.log("Received body:");
-  console.log(req.body);
+    res.status(200).json({
+      success: true,
+      message:
+        "Recording started",
+      recording: true
+    });
 
-  recording = false;
-
-  lastEvent = {
-    device_id: req.body.device_id || "unknown",
-    event: "STOP_RECORDING",
-    timestamp: new Date()
-  };
-
-  console.log("Recording:", recording);
-  console.log();
-
-  res.status(200).json({
-    success: true,
-    message: "Recording stopped",
-    recording: false
-  });
-});
+  }
+);
 
 
 // ==============================
-// WEBSITE CHECK STATUS
+// ESP32 STOP
 // ==============================
-app.get("/api/status", (req, res) => {
-  res.json({
-    recording: recording,
-    last_event: lastEvent
-  });
-});
+
+app.post(
+  "/api/stop",
+  (req, res) => {
+
+    console.log();
+    console.log(
+      "=============================="
+    );
+    console.log(
+      "ESP32 STOP RECORDING"
+    );
+    console.log(
+      "=============================="
+    );
+
+    console.log(
+      "Received body:",
+      req.body
+    );
+
+    recording = false;
+
+    lastEvent = {
+      device_id:
+        req.body.device_id ||
+        "unknown",
+
+      event:
+        "STOP_RECORDING",
+
+      timestamp:
+        new Date()
+    };
+
+    res.status(200).json({
+      success: true,
+      message:
+        "Recording stopped",
+      recording: false
+    });
+
+  }
+);
 
 
 // ==============================
-// TEST API
+// STATUS
 // ==============================
-app.get("/api/test", (req, res) => {
-  res.json({
-    success: true,
-    message: "AIoT API is working"
-  });
-});
+
+app.get(
+  "/api/status",
+  (req, res) => {
+
+    res.json({
+      recording:
+        recording,
+
+      last_event:
+        lastEvent,
+
+      last_audio:
+        lastAudio
+    });
+
+  }
+);
 
 
 // ==============================
-// Start Server
+// AUDIO UPLOAD
 // ==============================
-app.listen(port, host, () => {
-  console.log("==============================");
-  console.log(" AIoT Backend Server");
-  console.log("==============================");
-  console.log(`Server running on http://${host}:${port}`);
-  console.log();
-});
+
+app.post(
+  "/api/audio",
+
+  upload.single("audio"),
+
+  (req, res) => {
+
+    console.log();
+    console.log(
+      "=============================="
+    );
+    console.log(
+      "AUDIO RECEIVED"
+    );
+    console.log(
+      "=============================="
+    );
+
+    if (!req.file) {
+
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message:
+            "No audio file received"
+        });
+
+    }
+
+    console.log(
+      "Filename:",
+      req.file.filename
+    );
+
+    console.log(
+      "Size:",
+      req.file.size,
+      "bytes"
+    );
+
+    console.log(
+      "MIME:",
+      req.file.mimetype
+    );
+
+    lastAudio = {
+      filename:
+        req.file.filename,
+
+      size:
+        req.file.size,
+
+      mimetype:
+        req.file.mimetype,
+
+      uploaded_at:
+        new Date()
+    };
+
+    res.status(200).json({
+      success: true,
+      message:
+        "Audio uploaded successfully",
+      audio:
+        lastAudio
+    });
+
+  }
+);
+
+
+// ==============================
+// TEST
+// ==============================
+
+app.get(
+  "/api/test",
+  (req, res) => {
+
+    res.json({
+      success: true,
+      message:
+        "AIoT API is working"
+    });
+
+  }
+);
+
+
+// ==============================
+// Start server
+// ==============================
+
+app.listen(
+  port,
+  host,
+  () => {
+
+    console.log(
+      "=============================="
+    );
+
+    console.log(
+      " AIoT Backend Server"
+    );
+
+    console.log(
+      "=============================="
+    );
+
+    console.log(
+      `Server: http://${host}:${port}`
+    );
+
+    console.log(
+      `Uploads: ${uploadDir}`
+    );
+
+    console.log();
+
+  }
+);

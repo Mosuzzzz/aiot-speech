@@ -1,7 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -9,48 +11,120 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>AIoT Speech System</title>
+  <title>
+    AIoT Speech System
+  </title>
+
+  <style>
+
+    body {
+      font-family:
+        Arial,
+        sans-serif;
+
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+
+    button {
+      padding: 12px 20px;
+      margin-right: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+
+    .box {
+      border: 1px solid #ccc;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 8px;
+    }
+
+
+    #micStatus {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+
+    audio {
+      width: 100%;
+      margin-top: 15px;
+    }
+
+  </style>
+
 </head>
+
 
 <body>
 
-  <h1>AIoT Speech-to-Text</h1>
-
-  <hr>
-
-  <h2>ESP32 Status</h2>
-
-  <p id="espStatus">
-    Waiting for ESP32...
-  </p>
+  <h1>
+    AIoT Speech-to-Text System
+  </h1>
 
 
-  <h2>Microphone</h2>
+  <div class="box">
 
-  <button id="startButton">
-    Start Microphone
-  </button>
+    <h2>
+      ESP32 Status
+    </h2>
 
-  <button id="stopButton">
-    Stop Microphone
-  </button>
+    <p id="espStatus">
+      Waiting...
+    </p>
 
-  <p id="micStatus">
-    🔴 Microphone OFF
-  </p>
+  </div>
 
 
-  <h2>Transcript</h2>
+  <div class="box">
 
-  <div
-    id="transcript"
-    style="
-      border:1px solid #ccc;
-      padding:20px;
-      min-height:100px;
-    "
-  >
-    No speech yet...
+    <h2>
+      Microphone
+    </h2>
+
+    <button id="startButton">
+      Start Recording
+    </button>
+
+    <button id="stopButton">
+      Stop Recording
+    </button>
+
+
+    <p id="micStatus">
+      🔴 Microphone OFF
+    </p>
+
+  </div>
+
+
+  <div class="box">
+
+    <h2>
+      Recorded Audio
+    </h2>
+
+    <div id="audioContainer">
+      No audio recorded yet.
+    </div>
+
+  </div>
+
+
+  <div class="box">
+
+    <h2>
+      Upload Status
+    </h2>
+
+    <p id="uploadStatus">
+      Waiting...
+    </p>
+
   </div>
 
 
@@ -59,3 +133,4 @@
 </body>
 
 </html>
+
