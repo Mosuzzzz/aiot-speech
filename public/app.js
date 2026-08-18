@@ -35,6 +35,16 @@ const espStatus =
     "espStatus"
   );
 
+const transcriptStatus =
+  document.getElementById(
+    "transcriptStatus"
+  );
+
+const transcript =
+  document.getElementById(
+    "transcript"
+  );
+
 
 // ==============================
 // Start recording
@@ -198,6 +208,12 @@ async function startRecording() {
         uploadStatus.innerText =
           "⏳ Uploading audio...";
 
+        transcriptStatus.innerText =
+          "⏳ Transcribing audio...";
+
+        transcript.innerText =
+          "No transcript yet.";
+
 
         const formData =
           new FormData();
@@ -237,16 +253,35 @@ async function startRecording() {
 
           if (
             response.ok &&
-            data.success
+            data.success &&
+            data.transcription &&
+            data.transcription.success
           ) {
 
             uploadStatus.innerText =
               `✅ Uploaded: ${data.audio.filename}`;
 
+            transcriptStatus.innerText =
+              "✅ Transcription complete";
+
+            transcript.innerText =
+              data.transcription.transcript ||
+              "No transcript returned.";
+
           } else {
 
             uploadStatus.innerText =
-              "❌ Upload failed";
+              data.audio && data.audio.filename
+                ? `✅ Uploaded: ${data.audio.filename}`
+                : "❌ Upload failed";
+
+            transcriptStatus.innerText =
+              "❌ Transcription failed";
+
+            transcript.innerText =
+              data.error ||
+              data.message ||
+              "Transcription failed.";
 
           }
 
@@ -260,6 +295,12 @@ async function startRecording() {
 
           uploadStatus.innerText =
             "❌ Upload error";
+
+          transcriptStatus.innerText =
+            "❌ Transcription failed";
+
+          transcript.innerText =
+            error.message;
 
         }
 

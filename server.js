@@ -4,6 +4,7 @@ const cors = require("cors");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
+const { transcribeAudio } = require("./services/speechService");
 
 const app = express();
 
@@ -97,6 +98,8 @@ let recording = false;
 let lastEvent = null;
 
 let lastAudio = null;
+
+let lastTranscription = null;
 
 
 // ==============================
@@ -230,7 +233,10 @@ app.get(
         lastEvent,
 
       last_audio:
-        lastAudio
+        lastAudio,
+
+      last_transcription:
+        lastTranscription
     });
 
   }
@@ -246,7 +252,7 @@ app.post(
 
   upload.single("audio"),
 
-  (req, res) => {
+  async (req, res) => {
 
     console.log();
     console.log(
@@ -291,6 +297,9 @@ app.post(
       filename:
         req.file.filename,
 
+      path:
+        req.file.path,
+
       size:
         req.file.size,
 
@@ -301,13 +310,66 @@ app.post(
         new Date()
     };
 
-    res.status(200).json({
-      success: true,
-      message:
-        "Audio uploaded successfully",
-      audio:
-        lastAudio
-    });
+    try {
+
+      const transcription =
+        await transcribeAudio(
+          req.file.path
+        );
+
+      lastTranscription =
+        transcription;
+
+      res.status(200).json({
+        success: true,
+        message:
+          "Audio uploaded and transcribed",
+        audio: {
+          filename:
+            lastAudio.filename,
+
+          size:
+            lastAudio.size,
+
+          mimetype:
+            lastAudio.mimetype
+        },
+        transcription:
+          transcription
+      });
+
+    } catch (error) {
+
+      console.error(
+        "Transcription failed:",
+        error
+      );
+
+      lastTranscription = {
+        success: false,
+        error:
+          error.message
+      };
+
+      res.status(500).json({
+        success: false,
+        message:
+          "Audio uploaded but transcription failed",
+        audio: {
+          filename:
+            lastAudio.filename,
+
+          size:
+            lastAudio.size,
+
+          mimetype:
+            lastAudio.mimetype
+        },
+        error:
+          error.message
+      });
+
+    }
 
   }
 );

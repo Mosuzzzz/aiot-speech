@@ -1,6 +1,8 @@
 # Dependencies
 node_modules/
+speech/.venv/
 deploy/
+docs/
 
 # Environment variables
 .env
@@ -15,6 +17,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Runtime data
+uploads/
 *.pid
 *.seed
 
@@ -27,4 +30,3 @@ build/
 .DS_Store
 .vscode/
 .idea/
-
