@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>AIoT Speech System</title>
+</head>
+
+<body>
+
+  <h1>AIoT Speech-to-Text</h1>
+
+  <hr>
+
+  <h2>ESP32 Status</h2>
+
+  <p id="espStatus">
+    Waiting for ESP32...
+  </p>
+
+
+  <h2>Microphone</h2>
+
+  <button id="startButton">
+    Start Microphone
+  </button>
+
+  <button id="stopButton">
+    Stop Microphone
+  </button>
+
+  <p id="micStatus">
+    🔴 Microphone OFF
+  </p>
+
+
+  <h2>Transcript</h2>
+
+  <div
+    id="transcript"
+    style="
+      border:1px solid #ccc;
+      padding:20px;
+      min-height:100px;
+    "
+  >
+    No speech yet...
+  </div>
+
+
+  <script src="app.js"></script>
+
+</body>
+
+</html>
