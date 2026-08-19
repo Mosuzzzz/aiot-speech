@@ -10,17 +10,17 @@ const uvCommand = process.env.UV_BIN ||
 function transcribeAudio(audioPath) {
   return new Promise((resolve, reject) => {
     if (!audioPath) {
-      reject(new Error("Audio path is required"));
+      reject(new Error("ต้องระบุพาธของไฟล์เสียง"));
       return;
     }
 
     if (!fs.existsSync(audioPath)) {
-      reject(new Error(`Audio file not found: ${audioPath}`));
+      reject(new Error(`ไม่พบไฟล์เสียง: ${audioPath}`));
       return;
     }
 
     if (!fs.existsSync(speechDir)) {
-      reject(new Error(`Speech directory not found: ${speechDir}`));
+      reject(new Error(`ไม่พบโฟลเดอร์เสียง: ${speechDir}`));
       return;
     }
 
@@ -54,7 +54,7 @@ function transcribeAudio(audioPath) {
 
     child.on("error", (error) => {
       if (error.code === "ENOENT") {
-        reject(new Error("uv command not found. Install uv or add it to PATH."));
+        reject(new Error("ไม่พบคำสั่ง uv กรุณาติดตั้ง uv หรือเพิ่มไว้ใน PATH"));
         return;
       }
 
@@ -69,7 +69,7 @@ function transcribeAudio(audioPath) {
         if (cleanStdout) {
           try {
             const result = JSON.parse(cleanStdout);
-            reject(new Error(result.error || "Transcription failed"));
+            reject(new Error(result.error || "ถอดเสียงล้มเหลว"));
             return;
           } catch {
             // Fall through to the raw process output below.
@@ -80,14 +80,14 @@ function transcribeAudio(audioPath) {
           new Error(
             cleanStderr ||
               cleanStdout ||
-              `Transcription process failed with exit code ${code}`
+              `โปรเซสถอดเสียงล้มเหลวด้วยรหัสออก ${code}`
           )
         );
         return;
       }
 
       if (!cleanStdout) {
-        reject(new Error("Transcription process returned empty stdout"));
+        reject(new Error("โปรเซสถอดเสียงไม่ส่งข้อมูลกลับมา"));
         return;
       }
 
@@ -95,12 +95,12 @@ function transcribeAudio(audioPath) {
         const result = JSON.parse(cleanStdout);
 
         if (!result.success) {
-          reject(new Error(result.error || "Transcription failed"));
+          reject(new Error(result.error || "ถอดเสียงล้มเหลว"));
           return;
         }
 
         if (!result.transcript || !result.transcript.trim()) {
-          reject(new Error("Transcription returned an empty transcript"));
+          reject(new Error("การถอดเสียงได้ข้อความว่างเปล่า"));
           return;
         }
 
@@ -108,7 +108,7 @@ function transcribeAudio(audioPath) {
       } catch (error) {
         reject(
           new Error(
-            `Invalid JSON returned from transcription process: ${error.message}`
+            `โปรเซสถอดเสียงส่ง JSON ไม่ถูกต้อง: ${error.message}`
           )
         );
       }
