@@ -163,7 +163,7 @@ app.post(
     res.status(200).json({
       success: true,
       message:
-        "Recording started",
+        "เริ่มบันทึกเสียงแล้ว",
       recording: true
     });
 
@@ -212,7 +212,7 @@ app.post(
     res.status(200).json({
       success: true,
       message:
-        "Recording stopped",
+        "หยุดบันทึกเสียงแล้ว",
       recording: false
     });
 
@@ -278,7 +278,7 @@ app.post(
         .json({
           success: false,
           message:
-            "No audio file received"
+            "ไม่ได้รับไฟล์เสียง"
         });
 
     }
@@ -357,8 +357,8 @@ app.post(
         success: true,
         message:
           summary.success
-            ? "Audio uploaded, transcribed, and summarized"
-            : "Audio uploaded and transcribed, but summarization failed",
+            ? "อัปโหลดเสียง ถอดเสียง และสรุปเสร็จแล้ว"
+            : "อัปโหลดเสียงและถอดเสียงเสร็จแล้ว แต่สรุปล้มเหลว",
         audio: {
           filename:
             lastAudio.filename,
@@ -394,7 +394,7 @@ app.post(
       res.status(500).json({
         success: false,
         message:
-          "Audio uploaded but transcription failed",
+          "อัปโหลดเสียงแล้ว แต่ถอดเสียงล้มเหลว",
         audio: {
           filename:
             lastAudio.filename,
@@ -426,7 +426,7 @@ app.get(
     res.json({
       success: true,
       message:
-        "AIoT API is working"
+        "AIoT API ทำงานอยู่"
     });
 
   }
