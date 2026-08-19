@@ -1,55 +1,55 @@
-# AIoT Speech Backend
+# แบ็กเอนด์เสียง AIoT
 
-A small Express.js backend for controlling and checking an AIoT device’s recording state.
+แบ็กเอนด์ Express.js ขนาดเล็กสำหรับควบคุมและตรวจสอบสถานะการบันทึกเสียงของอุปกรณ์ AIoT โดยตั้งค่าให้ถอดเสียงและสรุปผลเป็นภาษาไทย
 
-## Requirements
+## สิ่งที่ต้องใช้
 
 - Node.js 18 or newer
 - npm
 
-## Setup
+## ติดตั้ง
 
 ```bash
 npm install
 ```
 
-## Run
+## เรียกใช้งาน
 
 ```bash
 node server.js
 ```
 
-The server starts at [http://localhost:3000](http://localhost:3000).
+เซิร์ฟเวอร์จะเริ่มทำงานที่ [http://localhost:8080](http://localhost:8080) ตามค่าเริ่มต้น
 
 ## API
 
-### Health check
+### ตรวจสอบสถานะ
 
 ```http
 GET /
 ```
 
-Returns a simple message confirming that the backend is running.
+ส่งหน้าเว็บของระบบกลับมา
 
-### Start recording
+### เริ่มบันทึกเสียง
 
 ```http
 POST /api/start
 ```
 
-### Stop recording
+### หยุดบันทึกเสียง
 
 ```http
 POST /api/stop
 ```
 
-### Check recording status
+### ตรวจสอบสถานะการบันทึก
 
 ```http
 GET /api/status
 ```
 
-Example response:
+ตัวอย่างคำตอบ:
 
 ```json
 {
@@ -57,14 +57,14 @@ Example response:
 }
 ```
 
-## Example requests
+## ตัวอย่างคำขอ
 
 ```bash
-curl -X POST http://localhost:3000/api/start
-curl -X POST http://localhost:3000/api/stop
-curl http://localhost:3000/api/status
+curl -X POST http://localhost:8080/api/start
+curl -X POST http://localhost:8080/api/stop
+curl http://localhost:8080/api/status
 ```
 
-## Notes
+## หมายเหตุ
 
-The recording state is kept in memory and resets whenever the server restarts.
+สถานะการบันทึกเสียงถูกเก็บไว้ในหน่วยความจำและจะรีเซ็ตเมื่อเริ่มเซิร์ฟเวอร์ใหม่
