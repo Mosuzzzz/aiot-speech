@@ -5,6 +5,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const { transcribeAudio } = require("./services/speechService");
+const { summarizeTranscript } = require("./services/aiService");
 
 const app = express();
 
@@ -100,6 +101,8 @@ let lastEvent = null;
 let lastAudio = null;
 
 let lastTranscription = null;
+
+let lastSummary = null;
 
 
 // ==============================
@@ -236,7 +239,10 @@ app.get(
         lastAudio,
 
       last_transcription:
-        lastTranscription
+        lastTranscription,
+
+      last_summary:
+        lastSummary
     });
 
   }
@@ -320,10 +326,39 @@ app.post(
       lastTranscription =
         transcription;
 
+      let summary = null;
+
+      try {
+
+        summary =
+          await summarizeTranscript(
+            transcription.transcript
+          );
+
+      } catch (error) {
+
+        console.error(
+          "Summarization failed:",
+          error
+        );
+
+        summary = {
+          success: false,
+          error:
+            error.message
+        };
+
+      }
+
+      lastSummary =
+        summary;
+
       res.status(200).json({
         success: true,
         message:
-          "Audio uploaded and transcribed",
+          summary.success
+            ? "Audio uploaded, transcribed, and summarized"
+            : "Audio uploaded and transcribed, but summarization failed",
         audio: {
           filename:
             lastAudio.filename,
@@ -335,7 +370,10 @@ app.post(
             lastAudio.mimetype
         },
         transcription:
-          transcription
+          transcription,
+
+        summary:
+          summary
       });
 
     } catch (error) {
@@ -350,6 +388,8 @@ app.post(
         error:
           error.message
       };
+
+      lastSummary = null;
 
       res.status(500).json({
         success: false,

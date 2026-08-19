@@ -45,6 +45,67 @@ const transcript =
     "transcript"
   );
 
+const summaryStatus =
+  document.getElementById(
+    "summaryStatus"
+  );
+
+const summary =
+  document.getElementById(
+    "summary"
+  );
+
+const keyPoints =
+  document.getElementById(
+    "keyPoints"
+  );
+
+
+function renderKeyPoints(points) {
+
+  keyPoints.innerHTML =
+    "";
+
+  if (
+    !Array.isArray(points) ||
+    points.length === 0
+  ) {
+
+    const item =
+      document.createElement(
+        "li"
+      );
+
+    item.innerText =
+      "No key points returned.";
+
+    keyPoints.appendChild(
+      item
+    );
+
+    return;
+  }
+
+  points.forEach(
+    point => {
+
+      const item =
+        document.createElement(
+          "li"
+        );
+
+      item.innerText =
+        point;
+
+      keyPoints.appendChild(
+        item
+      );
+
+    }
+  );
+
+}
+
 
 // ==============================
 // Start recording
@@ -214,6 +275,14 @@ async function startRecording() {
         transcript.innerText =
           "No transcript yet.";
 
+        summaryStatus.innerText =
+          "⏳ Generating AI summary...";
+
+        summary.innerText =
+          "No summary yet.";
+
+        renderKeyPoints([]);
+
 
         const formData =
           new FormData();
@@ -268,6 +337,36 @@ async function startRecording() {
               data.transcription.transcript ||
               "No transcript returned.";
 
+            if (
+              data.summary &&
+              data.summary.success
+            ) {
+
+              summaryStatus.innerText =
+                "✅ Summary complete";
+
+              summary.innerText =
+                data.summary.summary ||
+                "No summary returned.";
+
+              renderKeyPoints(
+                data.summary.key_points
+              );
+
+            } else {
+
+              summaryStatus.innerText =
+                "❌ Summary failed";
+
+              summary.innerText =
+                data.summary && data.summary.error
+                  ? data.summary.error
+                  : "Summary failed.";
+
+              renderKeyPoints([]);
+
+            }
+
           } else {
 
             uploadStatus.innerText =
@@ -282,6 +381,14 @@ async function startRecording() {
               data.error ||
               data.message ||
               "Transcription failed.";
+
+            summaryStatus.innerText =
+              "❌ Summary skipped";
+
+            summary.innerText =
+              "Summary was not generated because transcription failed.";
+
+            renderKeyPoints([]);
 
           }
 
@@ -301,6 +408,14 @@ async function startRecording() {
 
           transcript.innerText =
             error.message;
+
+          summaryStatus.innerText =
+            "❌ Summary skipped";
+
+          summary.innerText =
+            "Summary was not generated because upload failed.";
+
+          renderKeyPoints([]);
 
         }
 
