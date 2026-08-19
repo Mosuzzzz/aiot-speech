@@ -8,7 +8,7 @@ def write_json(payload):
     print(json.dumps(payload, ensure_ascii=False))
 
 
-def run_transcription(audio_path, model_name, device, compute_type):
+def run_transcription(audio_path, model_name, device, compute_type, language):
     from faster_whisper import WhisperModel
 
     model = WhisperModel(
@@ -17,7 +17,11 @@ def run_transcription(audio_path, model_name, device, compute_type):
         compute_type=compute_type
     )
 
-    segments, info = model.transcribe(str(audio_path))
+    segments, info = model.transcribe(
+        str(audio_path),
+        language=language,
+        task="transcribe"
+    )
     transcript = " ".join(segment.text.strip() for segment in segments).strip()
 
     return transcript, info
@@ -27,7 +31,7 @@ def main():
     if len(sys.argv) != 2:
         write_json({
             "success": False,
-            "error": "Usage: uv run transcribe.py /path/to/audio.webm"
+            "error": "วิธีใช้: uv run transcribe.py /path/to/audio.webm"
         })
         return 1
 
@@ -36,7 +40,7 @@ def main():
     if not audio_path.exists():
         write_json({
             "success": False,
-            "error": f"Audio file not found: {audio_path}"
+            "error": f"ไม่พบไฟล์เสียง: {audio_path}"
         })
         return 1
 
@@ -44,13 +48,15 @@ def main():
         model_name = os.getenv("WHISPER_MODEL", "base")
         device = os.getenv("WHISPER_DEVICE", "cuda")
         compute_type = os.getenv("WHISPER_COMPUTE_TYPE", "int8")
+        language = os.getenv("WHISPER_LANGUAGE", "th")
 
         try:
             transcript, info = run_transcription(
                 audio_path,
                 model_name,
                 device,
-                compute_type
+                compute_type,
+                language
             )
         except Exception as error:
             if device != "cuda":
@@ -65,13 +71,14 @@ def main():
                 audio_path,
                 model_name,
                 "cpu",
-                "int8"
+                "int8",
+                language
             )
 
         if not transcript:
             write_json({
                 "success": False,
-                "error": "Empty transcript"
+                "error": "ข้อความถอดเสียงว่างเปล่า"
             })
             return 1
 
