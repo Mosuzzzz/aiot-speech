@@ -3,11 +3,11 @@ const DEFAULT_GEMINI_BASE_URL = "https://generativelanguage.googleapis.com";
 
 function normalizeSummary(result) {
   if (!result || typeof result !== "object") {
-    throw new Error("Gemini returned an invalid response");
+    throw new Error("Gemini ส่งคำตอบไม่ถูกต้อง");
   }
 
   if (result.success === false) {
-    throw new Error(result.error || "AI summarization failed");
+    throw new Error(result.error || "การสรุปด้วย AI ล้มเหลว");
   }
 
   const summary =
@@ -24,7 +24,7 @@ function normalizeSummary(result) {
       : [];
 
   if (!summary) {
-    throw new Error("Gemini returned an empty summary");
+    throw new Error("Gemini ส่งสรุปว่างเปล่ากลับมา");
   }
 
   return {
@@ -44,7 +44,7 @@ function extractJson(text) {
     const end = cleanText.lastIndexOf("}");
 
     if (start === -1 || end === -1 || end <= start) {
-      throw new Error("Gemini response did not contain JSON");
+      throw new Error("คำตอบจาก Gemini ไม่มี JSON");
     }
 
     return JSON.parse(cleanText.slice(start, end + 1));
@@ -53,21 +53,22 @@ function extractJson(text) {
 
 function buildPrompt(transcript) {
   return [
-    "Summarize only the provided transcript.",
-    "Do not invent details that were not spoken.",
-    "Return only one JSON object. Do not include markdown.",
+    "สรุปเฉพาะข้อความถอดเสียงที่ให้มาเท่านั้น",
+    "ห้ามแต่งเติมรายละเอียดที่ไม่ได้พูดไว้",
+    "ตอบกลับเป็นภาษาไทย 100%",
+    "คืนค่าเป็น JSON object เพียงรายการเดียวเท่านั้น ห้ามใส่ markdown",
     "",
-    "Required JSON format:",
+    "รูปแบบ JSON ที่ต้องใช้:",
     "{",
     "  \"success\": true,",
-    "  \"summary\": \"A concise summary of the transcript.\",",
+    "  \"summary\": \"สรุปข้อความถอดเสียงแบบกระชับเป็นภาษาไทย\",",
     "  \"key_points\": [",
-    "    \"First important point\",",
-    "    \"Second important point\"",
+    "    \"ประเด็นสำคัญข้อแรกเป็นภาษาไทย\",",
+    "    \"ประเด็นสำคัญข้อที่สองเป็นภาษาไทย\"",
     "  ]",
     "}",
     "",
-    "Transcript:",
+    "ข้อความถอดเสียง:",
     transcript
   ].join("\n");
 }
@@ -81,7 +82,7 @@ function getGeminiText(data) {
     data.candidates[0].content.parts;
 
   if (!Array.isArray(parts)) {
-    throw new Error("Gemini response did not include text parts");
+    throw new Error("คำตอบจาก Gemini ไม่มีส่วนข้อความ");
   }
 
   return parts
@@ -96,7 +97,7 @@ async function summarizeWithGemini(transcript) {
     process.env.AI_API_KEY;
 
   if (!apiKey) {
-    throw new Error("GEMINI_API_KEY is not configured");
+    throw new Error("ยังไม่ได้ตั้งค่า GEMINI_API_KEY");
   }
 
   const model =
@@ -139,7 +140,7 @@ async function summarizeWithGemini(transcript) {
   if (!response.ok) {
     const errorText = await response.text();
     throw new Error(
-      `Gemini request failed with HTTP ${response.status}: ${errorText}`
+      `คำขอ Gemini ล้มเหลวด้วย HTTP ${response.status}: ${errorText}`
     );
   }
 
@@ -147,7 +148,7 @@ async function summarizeWithGemini(transcript) {
   const text = getGeminiText(data);
 
   if (!text) {
-    throw new Error("Gemini returned an empty response");
+    throw new Error("Gemini ส่งคำตอบว่างเปล่ากลับมา");
   }
 
   return normalizeSummary(extractJson(text));
@@ -160,7 +161,7 @@ async function summarizeTranscript(transcript) {
       : "";
 
   if (!cleanTranscript) {
-    throw new Error("Transcript is required for summarization");
+    throw new Error("ต้องมีข้อความถอดเสียงก่อนสรุป");
   }
 
   return summarizeWithGemini(cleanTranscript);
