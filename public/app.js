@@ -77,7 +77,7 @@ function renderKeyPoints(points) {
       );
 
     item.innerText =
-      "No key points returned.";
+      "ไม่มีประเด็นสำคัญที่ส่งกลับมา";
 
     keyPoints.appendChild(
       item
@@ -122,7 +122,7 @@ async function startRecording() {
     ) {
 
       console.log(
-        "Already recording"
+        "กำลังบันทึกเสียงอยู่แล้ว"
       );
 
       return;
@@ -137,7 +137,7 @@ async function startRecording() {
 
 
     console.log(
-      "Microphone permission granted"
+      "ได้รับอนุญาตให้ใช้ไมโครโฟนแล้ว"
     );
 
 
@@ -154,14 +154,14 @@ async function startRecording() {
       () => {
 
         console.log(
-          "Recording started"
+          "เริ่มบันทึกเสียงแล้ว"
         );
 
         micStatus.innerText =
-          "🟢 Recording...";
+          "🟢 กำลังบันทึกเสียง...";
 
         uploadStatus.innerText =
-          "Recording audio...";
+          "กำลังบันทึกเสียง...";
 
       };
 
@@ -191,7 +191,7 @@ async function startRecording() {
         );
 
         micStatus.innerText =
-          "❌ Recording error";
+          "❌ เกิดข้อผิดพลาดในการบันทึกเสียง";
 
       };
 
@@ -200,12 +200,12 @@ async function startRecording() {
       async () => {
 
         console.log(
-          "Recording stopped"
+          "หยุดบันทึกเสียงแล้ว"
         );
 
 
         micStatus.innerText =
-          "🔴 Microphone OFF";
+          "🔴 ปิดไมโครโฟน";
 
 
         const mimeType =
@@ -267,19 +267,19 @@ async function startRecording() {
         // ======================
 
         uploadStatus.innerText =
-          "⏳ Uploading audio...";
+          "⏳ กำลังอัปโหลดเสียง...";
 
         transcriptStatus.innerText =
-          "⏳ Transcribing audio...";
+          "⏳ กำลังถอดเสียง...";
 
         transcript.innerText =
-          "No transcript yet.";
+          "ยังไม่มีข้อความถอดเสียง";
 
         summaryStatus.innerText =
-          "⏳ Generating AI summary...";
+          "⏳ กำลังสร้างสรุปด้วย AI...";
 
         summary.innerText =
-          "No summary yet.";
+          "ยังไม่มีสรุป";
 
         renderKeyPoints([]);
 
@@ -328,14 +328,14 @@ async function startRecording() {
           ) {
 
             uploadStatus.innerText =
-              `✅ Uploaded: ${data.audio.filename}`;
+              `✅ อัปโหลดแล้ว: ${data.audio.filename}`;
 
             transcriptStatus.innerText =
-              "✅ Transcription complete";
+              "✅ ถอดเสียงเสร็จแล้ว";
 
             transcript.innerText =
               data.transcription.transcript ||
-              "No transcript returned.";
+              "ไม่มีข้อความถอดเสียงที่ส่งกลับมา";
 
             if (
               data.summary &&
@@ -343,11 +343,11 @@ async function startRecording() {
             ) {
 
               summaryStatus.innerText =
-                "✅ Summary complete";
+                "✅ สรุปเสร็จแล้ว";
 
               summary.innerText =
                 data.summary.summary ||
-                "No summary returned.";
+                "ไม่มีสรุปที่ส่งกลับมา";
 
               renderKeyPoints(
                 data.summary.key_points
@@ -356,12 +356,12 @@ async function startRecording() {
             } else {
 
               summaryStatus.innerText =
-                "❌ Summary failed";
+                "❌ สรุปล้มเหลว";
 
               summary.innerText =
                 data.summary && data.summary.error
                   ? data.summary.error
-                  : "Summary failed.";
+                  : "สรุปล้มเหลว";
 
               renderKeyPoints([]);
 
@@ -371,22 +371,22 @@ async function startRecording() {
 
             uploadStatus.innerText =
               data.audio && data.audio.filename
-                ? `✅ Uploaded: ${data.audio.filename}`
-                : "❌ Upload failed";
+                ? `✅ อัปโหลดแล้ว: ${data.audio.filename}`
+                : "❌ อัปโหลดล้มเหลว";
 
             transcriptStatus.innerText =
-              "❌ Transcription failed";
+              "❌ ถอดเสียงล้มเหลว";
 
             transcript.innerText =
               data.error ||
               data.message ||
-              "Transcription failed.";
+              "ถอดเสียงล้มเหลว";
 
             summaryStatus.innerText =
-              "❌ Summary skipped";
+              "❌ ข้ามการสรุป";
 
             summary.innerText =
-              "Summary was not generated because transcription failed.";
+              "ไม่ได้สร้างสรุปเพราะถอดเสียงล้มเหลว";
 
             renderKeyPoints([]);
 
@@ -401,19 +401,19 @@ async function startRecording() {
 
 
           uploadStatus.innerText =
-            "❌ Upload error";
+            "❌ เกิดข้อผิดพลาดในการอัปโหลด";
 
           transcriptStatus.innerText =
-            "❌ Transcription failed";
+            "❌ ถอดเสียงล้มเหลว";
 
           transcript.innerText =
             error.message;
 
           summaryStatus.innerText =
-            "❌ Summary skipped";
+            "❌ ข้ามการสรุป";
 
           summary.innerText =
-            "Summary was not generated because upload failed.";
+            "ไม่ได้สร้างสรุปเพราะอัปโหลดล้มเหลว";
 
           renderKeyPoints([]);
 
@@ -456,7 +456,7 @@ async function startRecording() {
 
 
     micStatus.innerText =
-      "❌ Microphone error";
+      "❌ เกิดข้อผิดพลาดกับไมโครโฟน";
 
 
     uploadStatus.innerText =
@@ -484,7 +484,7 @@ function stopRecording() {
   } else {
 
     console.log(
-      "Recorder is not running"
+      "เครื่องบันทึกเสียงยังไม่ได้ทำงาน"
     );
 
   }
@@ -529,12 +529,12 @@ async function checkESP32Status() {
     if (data.recording) {
 
       espStatus.innerText =
-        "🟢 ESP32: START RECORDING";
+        "🟢 ESP32: กำลังบันทึกเสียง";
 
     } else {
 
       espStatus.innerText =
-        "🔴 ESP32: STOPPED";
+        "🔴 ESP32: หยุดแล้ว";
 
     }
 
@@ -547,14 +547,14 @@ async function checkESP32Status() {
 
 
     espStatus.innerText =
-      "❌ Server connection error";
+      "❌ เชื่อมต่อเซิร์ฟเวอร์ไม่ได้";
 
   }
 
 }
 
 
-// Check every second
+// ตรวจสอบทุกวินาที
 setInterval(
   checkESP32Status,
   1000
